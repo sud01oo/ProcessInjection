@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InjectionDLL", "InjectionDL
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DLLTest", "DLLTest\DLLTest.vcxproj", "{25F8D1B0-3C56-42EC-84AB-B4A01932DF51}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PEInjection", "PEInjection\PEInjection.vcxproj", "{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{25F8D1B0-3C56-42EC-84AB-B4A01932DF51}.Release|x64.Build.0 = Release|x64
 		{25F8D1B0-3C56-42EC-84AB-B4A01932DF51}.Release|x86.ActiveCfg = Release|Win32
 		{25F8D1B0-3C56-42EC-84AB-B4A01932DF51}.Release|x86.Build.0 = Release|Win32
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Debug|x64.ActiveCfg = Debug|x64
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Debug|x64.Build.0 = Debug|x64
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Debug|x86.ActiveCfg = Debug|Win32
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Debug|x86.Build.0 = Debug|Win32
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Release|x64.ActiveCfg = Release|x64
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Release|x64.Build.0 = Release|x64
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Release|x86.ActiveCfg = Release|Win32
+		{EAA7D036-B398-4E53-A2C1-9D1592E2F46A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
