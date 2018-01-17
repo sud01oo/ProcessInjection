@@ -21,7 +21,7 @@ DWORD Rva2Offset(DWORD dwRva, UINT_PTR uiBaseAddress)
 }
 DWORD GetReflectiveLoaderOffset(VOID * lpReflectiveDllBuffer)
 {
-	//基址->在Dropper进程中开辟的堆空间
+	//基址->在Dropper进程中开辟的堆空间的起始地址
 	UINT_PTR uiBaseAddress = (UINT_PTR)lpReflectiveDllBuffer;
 	//得到NT头的文件地址
 	UINT_PTR uiExportDir = (UINT_PTR)uiBaseAddress + ((PIMAGE_DOS_HEADER)uiBaseAddress)->e_lfanew;
@@ -75,7 +75,7 @@ HANDLE WINAPI LoadRemoteLibraryR(HANDLE hProcess, LPVOID lpBuffer, DWORD dwLengt
 		{
 			if (!hProcess || !lpBuffer || !dwLength)
 				break;
-			//检查dll是否被反射加载
+			//获取加载器的地址
 			DWORD dwReflectiveLoaderOffset = GetReflectiveLoaderOffset(lpBuffer);
 			if (!dwReflectiveLoaderOffset)
 				break;
