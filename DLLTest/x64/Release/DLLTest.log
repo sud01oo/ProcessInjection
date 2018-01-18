@@ -1,7 +1,1 @@
-﻿  stdafx.cpp
-  DLLTest.cpp
-  Generating code
-  All 1 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  DLLTest.vcxproj -> d:\users\sudo\documents\visual studio 2015\Projects\ProcessInjection\x64\Release\DLLTest.exe
-  DLLTest.vcxproj -> d:\users\sudo\documents\visual studio 2015\Projects\ProcessInjection\x64\Release\DLLTest.pdb (Full PDB)
+﻿

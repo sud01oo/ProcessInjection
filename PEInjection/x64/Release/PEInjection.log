@@ -1,9 +1,1 @@
-﻿  PEInjection.cpp
-PEInjection.cpp(15): warning C4101: 'dwPID': unreferenced local variable
-  Generating code
-  2 of 12 functions (16.7%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  PEInjection.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\x64\Release\PEInjection.exe
-  PEInjection.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\x64\Release\PEInjection.pdb (Full PDB)
+﻿
