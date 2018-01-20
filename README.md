@@ -15,13 +15,18 @@ Finished：
 <ol>2：Reflection Injection
 	<ul>
   	<li>ReflectiveDLLInjection</li>
+	<li>ReflectiveDLL（Unfinished）</li>
+	<li>ReflectiveDLLPEForm（Unfinished）</li>
 	</ul>
 </ol>
+<h4>
 *The Reflection Injection is reference from https://github.com/stephenfewer/ReflectiveDLLInjection<br/>
-
+*The ReflectiveDLLPEForm is PE form for realizing the "LoadLibraryA" function.<br/>
+</h4>
 <h2>Processing:</h2>
 Reflection Injection
 	<ul>
   	<li>ReflectiveDLL</li>
+	<li>ReflectiveDLLPEForm</li>
 	</ul>
-The Reflection Injection's DLL is so diffcult that will spend a lot of days to finish it.
+The "images" folder is some images for learning some structure like PE,PEB and so on. 
