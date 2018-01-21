@@ -82,8 +82,7 @@ ULONG_PTR WINAPI ReflectiveLoader(ULONG_PTR callAddress)
 	//callAddress：在缓冲区开辟空间的起始地址，在原注入中uiLibraryAddress = caller();
 	//caller定义：__declspec(noinline) ULONG_PTR caller( VOID ) { return (ULONG_PTR)_ReturnAddress(); }
 	//caller功能：获取当前指令的下一条指令的地址。
-	//0x10偏移是为了复现找文件起始地址的情况，不至于开始就是0x4D5A
-	uiLibraryAddress = callAddress + 0x10;
+	uiLibraryAddress = caller();
 
 	// loop through memory backwards searching for our images base address
 	// we dont need SEH style search as we shouldnt generate any access violations with this
@@ -141,7 +140,7 @@ ULONG_PTR WINAPI ReflectiveLoader(ULONG_PTR callAddress)
 				uiValueC += *((BYTE *)uiValueB);
 			uiValueB++;
 		} while (--usCounter);
-
+		//获取kerlnel32中的函数地址
 		// compare the hash with that of kernel32.dll
 		if ((DWORD)uiValueC == KERNEL32DLL_HASH)
 		{
@@ -179,7 +178,7 @@ ULONG_PTR WINAPI ReflectiveLoader(ULONG_PTR callAddress)
 
 					// use this functions name ordinal as an index into the array of name pointers
 					uiAddressArray += (DEREF_16(uiNameOrdinals) * sizeof(DWORD));
-
+					//获取函数地址
 					// store this functions VA
 					if (dwHashValue == LOADLIBRARYA_HASH)
 						pLoadLibraryA = (LOADLIBRARYA)(uiBaseAddress + DEREF_32(uiAddressArray));
@@ -201,6 +200,7 @@ ULONG_PTR WINAPI ReflectiveLoader(ULONG_PTR callAddress)
 		}
 		else if ((DWORD)uiValueC == NTDLLDLL_HASH)
 		{
+			//与之前解析PE结构相同
 			// get this modules base address
 			uiBaseAddress = (ULONG_PTR)((PLDR_DATA_TABLE_ENTRY)uiValueA)->DllBase;
 

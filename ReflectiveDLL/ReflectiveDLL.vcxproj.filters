@@ -24,7 +24,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReflectiveDLL.h">
+    <ClInclude Include="ReflectiveLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

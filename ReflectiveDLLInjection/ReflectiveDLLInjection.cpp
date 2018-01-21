@@ -102,7 +102,7 @@ int main()
 			BreakForError("Failed to Escalate Privilege.");
 
 		//Open target process
-		HANDLE hTargetProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId());//dwPid);
+		HANDLE hTargetProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,dwPid);
 		if (!hTargetProcess)
 			BreakForError("Failed to Open the Target Process.");
 
