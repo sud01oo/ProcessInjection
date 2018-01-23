@@ -95,7 +95,7 @@ __declspec(dllexport) ULONG_PTR WINAPI ReflectiveLoader(LPVOID lpParameter)
 				uiValueC += *((BYTE *)uiValueB);
 			uiValueB++;
 		} while (--usCounter);
-
+		//获取目标进程中的接下来需要的函数地址
 		// compare the hash with that of kernel32.dll
 		if ((DWORD)uiValueC == KERNEL32DLL_HASH)
 		{
