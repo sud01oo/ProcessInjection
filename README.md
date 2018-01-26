@@ -1,9 +1,9 @@
 # ProcessInjection
 
-Some ways to inject a DLL into a alive process
-----------------------------------------------
+一些进程注入方法的事件及分析，分析在：bbs.pediy.com
+------------------------------------------------
 
-Finished：
+已完成：
 ---------
 <ol>1：Classic Injection
 	<ul>
@@ -17,14 +17,22 @@ Finished：
   	<li>ReflectiveDLLInjection</li>
 	<li>ReflectiveDLL</li>
 	<li>ReflectiveDLLPEForm</li>
-		<li>*The Reflection Injection is reference from https://github.com/stephenfewer/ReflectiveDLLInjection<br/></li>
-		<li>*The ReflectiveDLLPEForm is executable form for realizing the "LoadLibraryA" function.<br/></li>
+		<li>*代码参考：https://github.com/stephenfewer/ReflectiveDLLInjection<br/></li>
+		<li>*为方便<br/></li>
+	</ul>
+</ol>
+<ol>2：MEMORY MODULE
+	<ul>
+  	<li>对于这种注入，我在Github上找到了两个项目，以供参考，由于和Reflection注入目标相同，稍后会上传二者之间不同部分的代码。</li>
+	<li>项目地址</li>
+	<li>https://github.com/DarthTon/Blackbone</li>
+	<li>https://github.com/fancycode/MemoryModule</li>	
 	</ul>
 </ol>
 
-<h2>Processing:</h2>
+<h2>进行中:</h2>
 MEMORY MODULE
 	<ul>
-  	<li>learning</li>
+  	<li>分析二者间的不同</li>
 	</ul>
-The "images" folder is some images for learning some structure like PE,PEB and so on. 
+“images”文件夹是在学习过程中，会遇到的一些数据结构的可视化图片，方便查阅相关结构。
