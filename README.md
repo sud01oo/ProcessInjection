@@ -18,10 +18,10 @@
 	<li>ReflectiveDLL</li>
 	<li>ReflectiveDLLPEForm</li>
 		<li>*代码参考：https://github.com/stephenfewer/ReflectiveDLLInjection<br/></li>
-		<li>*为方便<br/></li>
+		<li>*为方便调试，该工程是在外部实现的对DLL的解析，其实已经与下一个项目相同。<br/></li>
 	</ul>
 </ol>
-<ol>2：MEMORY MODULE
+<ol>3：MEMORY MODULE
 	<ul>
   	<li>对于这种注入，我在Github上找到了两个项目，以供参考，由于和Reflection注入目标相同，稍后会上传二者之间不同部分的代码。</li>
 	<li>项目地址</li>
