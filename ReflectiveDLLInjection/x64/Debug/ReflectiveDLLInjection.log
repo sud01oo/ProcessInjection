@@ -1,1 +1,8 @@
-﻿
+﻿  stdafx.cpp
+  ReflectiveDLLInjection.cpp
+d:\users\sudo\documents\github\processinjection\reflectivedllinjection\reflectivedllinjection.cpp(16): warning C4101: 'dwPID': unreferenced local variable
+  LoadRemoteLibraryR.cpp
+  Generating Code...
+d:\users\sudo\documents\github\processinjection\reflectivedllinjection\loadremotelibraryr.cpp(21): warning C4715: 'Rva2Offset': not all control paths return a value
+  ReflectiveDLLInjection.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLLInjection.exe
+  ReflectiveDLLInjection.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLLInjection.pdb (Full PDB)

@@ -1,0 +1,4 @@
+﻿  stdafx.cpp
+  dllmain.cpp
+  ReflectiveDLL.cpp
+d:\users\sudo\documents\github\processinjection\reflectivedll\reflectivedll.cpp(70): error C3861: '__readgsqword': identifier not found

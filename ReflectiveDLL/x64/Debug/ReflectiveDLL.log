@@ -1,1 +1,6 @@
-﻿
+﻿  stdafx.cpp
+  dllmain.cpp
+  ReflectiveDLL.cpp
+     Creating library C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLL.lib and object C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLL.exp
+  ReflectiveDLL.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLL.dll
+  ReflectiveDLL.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLL.pdb (Full PDB)
