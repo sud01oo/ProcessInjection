@@ -178,7 +178,7 @@ typedef struct
 #ifdef __cplusplus
 extern "C" {
 #endif
-	ULONG_PTR WINAPI ReflectiveLoader(ULONG_PTR callAddress);
+	ULONG_PTR WINAPI Loader(ULONG_PTR callAddress);
 #ifdef __cplusplus
 }
 #endif

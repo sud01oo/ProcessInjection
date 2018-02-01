@@ -11,8 +11,8 @@ int main()
 {
 	do
 	{
-		//这里依旧是任意DLL，我们要实现的功能就是从内存里把DLL加载了，功能依旧是解析DLL
-		char *dllFile = "F:\\ReflectiveDLLInjection\\x64\\Debug\\reflective_dll.dll";
+		//已经编译出的dll，在实现LoadLibraryA函数阶段，可以是任意DLL
+		char *dllFile = "C:\\Users\\sudo\\Desktop\\ReflectiveDLLPEForm\\x64\\Debug\\ReflectiveDLL.dll";
 		HANDLE hFile = CreateFileA(dllFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
@@ -21,9 +21,35 @@ int main()
 		}
 		else
 		{
-			cout << "Get File Success!" << endl;
+			cout << "Get File Success." << endl;
 		}
 		DWORD dwLength = GetFileSize(hFile, NULL);
-		if(dwLength == INVALID_FILE_SIZE ||)
-	}
+		if (dwLength == INVALID_FILE_SIZE || dwLength == 0)
+		{
+			cout << "Failed to get the Dll file size." << endl;
+			break;
+		}
+		else
+		{
+			cout << "File size is :" << dwLength << endl;
+		}
+		//dll在内存中的地址（未加载）
+		LPVOID hBaseAddress = VirtualAlloc(NULL, dwLength, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		if (!hBaseAddress)
+		{
+			cout << "Failed to Alloc Memory." << endl;
+			break;
+		}
+		else
+		{
+			cout << "BaseAddress is :" << hBaseAddress << endl;
+		}
+		DWORD dwBytesRead;
+		if (ReadFile(hFile, hBaseAddress, dwLength, &dwBytesRead, NULL) == false)
+			cout << "Failed to Read File!" << endl;
+		Loader((ULONG_PTR)hBaseAddress);
+
+	} while (0);
+	system("parse");
+	return 0;
 }

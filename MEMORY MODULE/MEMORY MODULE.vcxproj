@@ -149,6 +149,7 @@
     <ClInclude Include="Loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Loader.c" />
     <ClCompile Include="MoudleMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

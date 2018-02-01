@@ -73,7 +73,7 @@ int main()
 	do
 	{
 
-		LPCTSTR processName = L"notepad.exe";
+		LPCTSTR processName = L"Task Manager.exe";
 		DWORD dwPid = GetProcessIdByName(processName);
 		if (dwPid == 0)
 			BreakForError("Failed to Get the notepad's PID.");
@@ -102,7 +102,8 @@ int main()
 			BreakForError("Failed to Escalate Privilege.");
 
 		//Open target process
-		HANDLE hTargetProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,dwPid);
+		HANDLE hTargetProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,1496);
+		cout << GetLastError() << endl;
 		if (!hTargetProcess)
 			BreakForError("Failed to Open the Target Process.");
 
