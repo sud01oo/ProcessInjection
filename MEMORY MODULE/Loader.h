@@ -4,6 +4,8 @@
 typedef HMODULE(WINAPI * LOADLIBRARYA)(LPCSTR);
 typedef FARPROC(WINAPI * GETPROCADDRESS)(HMODULE, LPCSTR);
 typedef LPVOID(WINAPI * VIRTUALALLOC)(LPVOID, SIZE_T, DWORD, DWORD);
+typedef LPVOID(WINAPI * VIRTUALFREE)(LPVOID, SIZE_T, DWORD);
+typedef LPVOID(WINAPI * VIRTUALPROTECT)(LPVOID, SIZE_T, DWORD, PDWORD);
 typedef DWORD(NTAPI * NTFLUSHINSTRUCTIONCACHE)(HANDLE, PVOID, ULONG);
 
 //HASH算法依旧使用原项目
@@ -13,6 +15,8 @@ typedef DWORD(NTAPI * NTFLUSHINSTRUCTIONCACHE)(HANDLE, PVOID, ULONG);
 #define LOADLIBRARYA_HASH				0xEC0E4E8E
 #define GETPROCADDRESS_HASH				0x7C0DFCAA
 #define VIRTUALALLOC_HASH				0x91AFCA54
+#define VIRTUALFREE_HASH				0x030633ac
+#define VIRTUALPROCT_HASH				0x7946c61b
 #define NTFLUSHINSTRUCTIONCACHE_HASH	0x534C0AB8
 
 
@@ -39,6 +43,18 @@ __forceinline DWORD hash(char * c)
 
 	return h;
 }
+typedef struct _MemoryModule
+{
+	VIRTUALALLOC mVirutalAlloc;
+	VIRTUALFREE mVirtualFree;
+	VIRTUALPROTECT mVirtualProtect;
+	PIMAGE_NT_HEADERS old_header;
+	PIMAGE_NT_HEADERS header;
+	SYSTEM_INFO sysInfo;
+	
+}MemoryModule,*PMemoryModule;
+
+BOOL FinalizeSections(PMemoryModule mMemory);
 
 //以下为一些peb相关数据结构
 typedef struct _PEB_FREE_BLOCK // 2 elements, 0x8 bytes
@@ -175,6 +191,14 @@ typedef struct
 } IMAGE_RELOC, *PIMAGE_RELOC;
 
 
+typedef struct {
+	LPVOID address;
+	LPVOID alignedAddress;
+	SIZE_T size;
+	DWORD characteristics;
+	BOOL last;
+} SECTIONFINALIZEDATA, *PSECTIONFINALIZEDATA;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -182,3 +206,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+
