@@ -7,6 +7,7 @@ typedef LPVOID(WINAPI * VIRTUALALLOC)(LPVOID, SIZE_T, DWORD, DWORD);
 typedef LPVOID(WINAPI * VIRTUALFREE)(LPVOID, SIZE_T, DWORD);
 typedef LPVOID(WINAPI * VIRTUALPROTECT)(LPVOID, SIZE_T, DWORD, PDWORD);
 typedef DWORD(NTAPI * NTFLUSHINSTRUCTIONCACHE)(HANDLE, PVOID, ULONG);
+typedef BOOL(WINAPI * DLLMAIN)(HINSTANCE, DWORD, LPVOID);
 
 //HASH算法依旧使用原项目
 #define KERNEL32DLL_HASH				0x6A4ABC5B
@@ -45,11 +46,13 @@ __forceinline DWORD hash(char * c)
 }
 typedef struct _MemoryModule
 {
+	ULONG_PTR bufferAddress;
+	ULONG_PTR baseAddress;
+	PIMAGE_NT_HEADERS old_header;
+	PIMAGE_NT_HEADERS header;
 	VIRTUALALLOC mVirutalAlloc;
 	VIRTUALFREE mVirtualFree;
 	VIRTUALPROTECT mVirtualProtect;
-	PIMAGE_NT_HEADERS old_header;
-	PIMAGE_NT_HEADERS header;
 	SYSTEM_INFO sysInfo;
 	
 }MemoryModule,*PMemoryModule;

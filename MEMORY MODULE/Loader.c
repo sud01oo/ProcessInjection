@@ -44,28 +44,28 @@ GetRealSectionSize(PMemoryModule module, PIMAGE_SECTION_HEADER section,PIMAGE_NT
 	return (SIZE_T)size;
 }
 
-BOOL CopySections(PIMAGE_NT_HEADERS srcHeader, PIMAGE_NT_HEADERS targetHeader,ULONG_PTR srcAddress,ULONG_PTR targetAddress,PMemoryModule mModule)
+BOOL CopySections(PMemoryModule mModule)
 {
 	int i, section_size;
 	ULONG_PTR dest;
-	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(srcHeader); 
-	DWORD ValueA;
-	DWORD ValueB;
-	DWORD ValueC;
-	for (i = 0; i < targetHeader->FileHeader.NumberOfSections; i++, section++)
+	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(mModule->header); 
+	ULONG_PTR ValueA;
+	ULONG_PTR ValueB;
+	ULONG_PTR ValueC;
+	for (i = 0; i < mModule->header->FileHeader.NumberOfSections; i++, section++)
 	{
 		//在DLL中，当前节不含有数据，但是可能定义未初始化的数据
 		if (section->SizeOfRawData == 0)
 		{
 			//内存中节的对齐粒度
-			section_size = srcHeader->OptionalHeader.SectionAlignment;
+			section_size = mModule->old_header->OptionalHeader.SectionAlignment;
 			if (section_size > 0)
 			{
-				dest = mModule->mVirutalAlloc(targetAddress, section_size, MEM_COMMIT, PAGE_READWRITE, NULL);//mModule->flProtect);
+				dest = mModule->mVirutalAlloc(mModule->baseAddress+ section->VirtualAddress, section_size, MEM_COMMIT, PAGE_READWRITE, NULL);//mModule->flProtect);
 				if (dest == NULL)
 					return FALSE;
 				//始终保持页对齐，以上分配的内存，正好为一页
-				dest = targetAddress + section->VirtualAddress;
+				dest = mModule->baseAddress + section->VirtualAddress;
 				//64位模式下，这里截断成32位模式
 				section->Misc.PhysicalAddress = (DWORD)((uintptr_t)dest & 0xffffffff);
 			}
@@ -74,10 +74,10 @@ BOOL CopySections(PIMAGE_NT_HEADERS srcHeader, PIMAGE_NT_HEADERS targetHeader,UL
 		}
 
 		//节中含有数据
-		dest = mModule->mVirutalAlloc(targetAddress + section->VirtualAddress, section->SizeOfRawData, MEM_COMMIT, PAGE_READWRITE, NULL);
+		dest = mModule->mVirutalAlloc(mModule->baseAddress + section->VirtualAddress, section->SizeOfRawData, MEM_COMMIT, PAGE_READWRITE, NULL);
 		//
 		ValueA = section->SizeOfRawData;//节的大小
-		ValueB = targetAddress + section->PointerToRawData;//数据的起始地址
+		ValueB = mModule->bufferAddress + section->PointerToRawData;//数据的起始地址
 		ValueC = dest;//数据将被拷贝到到的地址
 								 //复制头和节表的数据到新开辟的缓冲区
 		while (ValueA--)
@@ -85,7 +85,7 @@ BOOL CopySections(PIMAGE_NT_HEADERS srcHeader, PIMAGE_NT_HEADERS targetHeader,UL
 
 		if (dest == NULL)
 			return FALSE;
-		dest = targetAddress + section->VirtualAddress;
+		dest = mModule->baseAddress + section->VirtualAddress;
 		
 		section->Misc.PhysicalAddress = (DWORD)((uintptr_t)dest & 0xffffffff);
 	}//end for
@@ -376,6 +376,7 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 	}
 	uiBaseAddress = code;
 	//提交内存
+	uiLibraryAddress + ((PIMAGE_DOS_HEADER)uiLibraryAddress)->e_lfanew;
 	header = pVirtualAlloc(code, ((PIMAGE_NT_HEADERS)uiHeaderValue)->OptionalHeader.SizeOfHeaders,
 		MEM_COMMIT,
 		PAGE_READWRITE,
@@ -384,14 +385,26 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 	uiValueB = uiLibraryAddress;//DLL的起始地址，即缓冲区的起始地址
 	uiValueC = code;//dll将被加载的地址的起始地址
 					//复制头和节表的数据到新开辟的缓冲区
-	//将镜像的加载地址写到PE头，不论是否在建议的地址加载
-	((PIMAGE_NT_HEADERS)header)->OptionalHeader.ImageBase = code;
+	
 	while (uiValueA--)
 		*(BYTE *)uiValueC++ = *(BYTE *)uiValueB++;
-	PMemoryModule result = (PMemoryModule)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(MemoryModule));
-	result->mVirutalAlloc = pVirtualAlloc;
+	PMemoryModule module = (PMemoryModule)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(MemoryModule));
+	module->mVirutalAlloc = pVirtualAlloc;
+	module->mVirtualProtect = pVirtualProtect;
+	module->mVirtualFree = pVirtualFree;
+	module->bufferAddress = uiLibraryAddress;
+	module->baseAddress = uiBaseAddress;
+	module->header = code + ((PIMAGE_DOS_HEADER)header)->e_lfanew;
+	module->old_header = uiHeaderValue;
+	module->sysInfo = sysInfo;
+
+
+	//将镜像的加载地址写到PE头，不论是否在建议的地址加载
+	module->header->OptionalHeader.ImageBase = code;
+
+
 	//CopySections(PIMAGE_NT_HEADERS srcHeader, PIMAGE_NT_HEADERS targetHeader,ULONG_PTR srcAddress,ULONG_PTR targetAddress,PMemoryModule mModule)
-	if (!CopySections((PIMAGE_NT_HEADERS)uiHeaderValue, (PIMAGE_NT_HEADERS)header, uiLibraryAddress, code, result))
+	if (!CopySections(module))
 	{
 		return NULL;
 	}
@@ -510,34 +523,45 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 		}
 	}
 	////释放标为“丢弃”的内存，依照节头修改内存属性
-	
+	if (!FinalizeSections(module))
+	{
+		return NULL;
+	}
 
+	// uiValueA = the VA of our newly loaded DLL/EXE's entry point
+	uiValueA = (uiBaseAddress + ((PIMAGE_NT_HEADERS)uiHeaderValue)->OptionalHeader.AddressOfEntryPoint);
+
+	// We must flush the instruction cache to avoid stale code being used which was updated by our relocation processing.
+	pNtFlushInstructionCache((HANDLE)-1, NULL, 0);
+	BOOL RES = ((DLLMAIN)uiValueA)((HINSTANCE)uiBaseAddress, DLL_PROCESS_ATTACH, NULL);
+	if (RES);
+	// STEP 8: return our new entry point address so whatever called us can call DllMain() if needed.
 }
 
-BOOL FinalizeSections(PIMAGE_NT_HEADERS header,PMemoryModule mMemory)
+BOOL FinalizeSections(PMemoryModule mMemory)
 {
 	int i;
-	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(header);
+	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(mMemory->header);
 #ifdef _WIN64
 	// "PhysicalAddress" might have been truncated to 32bit above, expand to
 	// 64bits again.
 	//拷贝的时候被截断，这里恢复成64位
-	uintptr_t imageOffset = ((uintptr_t)header->OptionalHeader.ImageBase & 0xffffffff00000000);
+	uintptr_t imageOffset = ((uintptr_t)mMemory->header->OptionalHeader.ImageBase & 0xffffffff00000000);
 #else
 	static const uintptr_t imageOffset = 0;
 #endif
 	SECTIONFINALIZEDATA sectionData;
 	sectionData.address = (LPVOID)((uintptr_t)section->Misc.PhysicalAddress | imageOffset);
 	sectionData.alignedAddress = AlignAddressDown(sectionData.address, mMemory->sysInfo.dwPageSize);
-	sectionData.size = GetRealSectionSize(mMemory, section,header);
+	sectionData.size = GetRealSectionSize(mMemory, section, mMemory->header);
 	sectionData.characteristics = section->Characteristics;
 	sectionData.last = FALSE;
 	section++;
 
-	for (i = 1; i<header->FileHeader.NumberOfSections; i++, section++) {
+	for (i = 1; i<mMemory->header->FileHeader.NumberOfSections; i++, section++) {
 		LPVOID sectionAddress = (LPVOID)((uintptr_t)section->Misc.PhysicalAddress | imageOffset);
 		LPVOID alignedAddress = AlignAddressDown(sectionAddress, mMemory->sysInfo.dwPageSize);
-		SIZE_T sectionSize = GetRealSectionSize(mMemory, section,header);
+		SIZE_T sectionSize = GetRealSectionSize(mMemory, section, mMemory->header);
 		// Combine access flags of all sections that share a page
 		// TODO(fancycode): We currently share flags of a trailing large section
 		//   with the page of a first small section. This should be optimized.
@@ -553,7 +577,7 @@ BOOL FinalizeSections(PIMAGE_NT_HEADERS header,PMemoryModule mMemory)
 			continue;
 		}
 
-		if (!FinalizeSection(mMemory, &sectionData,header)) {
+		if (!FinalizeSection(mMemory, &sectionData)) {
 			return FALSE;
 		}
 		sectionData.address = sectionAddress;
@@ -562,7 +586,7 @@ BOOL FinalizeSections(PIMAGE_NT_HEADERS header,PMemoryModule mMemory)
 		sectionData.characteristics = section->Characteristics;
 	}
 	sectionData.last = TRUE;
-	if (!FinalizeSection(mMemory, &sectionData,header)) {
+	if (!FinalizeSection(mMemory, &sectionData)) {
 		return FALSE;
 	}
 	return TRUE;
@@ -572,7 +596,7 @@ BOOL FinalizeSections(PIMAGE_NT_HEADERS header,PMemoryModule mMemory)
 
 
 static BOOL
-FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData,PIMAGE_NT_HEADERS header) {
+FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData) {
 	DWORD protect, oldProtect;
 	BOOL executable;
 	BOOL readable;
@@ -586,7 +610,7 @@ FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData,PIMAGE_NT
 		// section is not needed any more and can safely be freed
 		if (sectionData->address == sectionData->alignedAddress &&
 			(sectionData->last ||
-				header->OptionalHeader.SectionAlignment == module->sysInfo.dwPageSize ||
+				module->header->OptionalHeader.SectionAlignment == module->sysInfo.dwPageSize ||
 				(sectionData->size % module->sysInfo.dwPageSize) == 0)
 			) {
 			// Only allowed to decommit whole pages
@@ -607,7 +631,7 @@ FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData,PIMAGE_NT
 
 	// change memory access flags
 	//修改区段访问权限
-	if (VirtualProtect(sectionData->address, sectionData->size, protect, &oldProtect) == 0) {
+	if (module->mVirtualProtect(sectionData->address, sectionData->size, protect, &oldProtect) == 0) {
 		return FALSE;
 	}
 
