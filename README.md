@@ -23,9 +23,9 @@
 </ol>
 <ol>3：MEMORY MODULE
 	<ul>
-  	<li>对于这种注入，我在Github上找到了两个项目，以供参考，由于和Reflection注入目标相同，稍后会上传二者之间不同部分的代码。</li>
-	<li>项目地址</li>
-	<li>https://github.com/DarthTon/Blackbone</li>
+  	<li>Memory Module。</li>
+	<li>使用了Reflection Injection的代码，对部分代码进行了修改。</li>
+	<li>参考</li>
 	<li>https://github.com/fancycode/MemoryModule</li>	
 	</ul>
 </ol>
