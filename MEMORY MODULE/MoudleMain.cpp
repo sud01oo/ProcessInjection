@@ -12,7 +12,7 @@ int main()
 	do
 	{
 		//已经编译出的dll，在实现LoadLibraryA函数阶段，可以是任意DLL
-		char *dllFile = "C:\\Users\\sudo\\Desktop\\ReflectiveDLLPEForm\\x64\\Debug\\ReflectiveDLL.dll";
+		char *dllFile = "D:\\users\\sudo\\Documents\\GitHub\\ProcessInjection\\x64\\Debug\\MemroyInjectionDLL.dll";
 		HANDLE hFile = CreateFileA(dllFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile == INVALID_HANDLE_VALUE)
 		{

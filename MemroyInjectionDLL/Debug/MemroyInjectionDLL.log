@@ -1,0 +1,6 @@
+﻿  stdafx.cpp
+  dllmain.cpp
+  MemroyInjectionDLL.cpp
+     Creating library D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\MemroyInjectionDLL.lib and object D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\MemroyInjectionDLL.exp
+  MemroyInjectionDLL.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\MemroyInjectionDLL.dll
+  MemroyInjectionDLL.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\MemroyInjectionDLL.pdb (Full PDB)

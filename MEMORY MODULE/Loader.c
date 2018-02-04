@@ -13,11 +13,12 @@ static int ProtectionFlags[2][2][2] = {
 		{ PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE },
 	},
 };
+//加上查1字节一页后，即为将下一个页的起始地址
 DWORD AlignValueUp(DWORD value, DWORD alignment)
 {
 	return (value + alignment - 1) & ~(alignment - 1);
 }
-
+//0x1000-1 = 0xfff 取反后，后三位为0，与运算后的结果为后三位舍为0的值，即为向下取整
 uintptr_t
 AlignValueDown(uintptr_t value, uintptr_t alignment) {
 	return value & ~(alignment - 1);
@@ -376,7 +377,7 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 	}
 	uiBaseAddress = code;
 	//提交内存
-	uiLibraryAddress + ((PIMAGE_DOS_HEADER)uiLibraryAddress)->e_lfanew;
+	uiHeaderValue = uiLibraryAddress + ((PIMAGE_DOS_HEADER)uiLibraryAddress)->e_lfanew;
 	header = pVirtualAlloc(code, ((PIMAGE_NT_HEADERS)uiHeaderValue)->OptionalHeader.SizeOfHeaders,
 		MEM_COMMIT,
 		PAGE_READWRITE,
@@ -384,8 +385,7 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 	uiValueA = ((PIMAGE_NT_HEADERS)uiHeaderValue)->OptionalHeader.SizeOfHeaders;//所有头+节表的大小
 	uiValueB = uiLibraryAddress;//DLL的起始地址，即缓冲区的起始地址
 	uiValueC = code;//dll将被加载的地址的起始地址
-					//复制头和节表的数据到新开辟的缓冲区
-	
+	//复制头和节表的数据到新开辟的缓冲区
 	while (uiValueA--)
 		*(BYTE *)uiValueC++ = *(BYTE *)uiValueB++;
 	PMemoryModule module = (PMemoryModule)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(MemoryModule));
@@ -536,6 +536,8 @@ ULONG_PTR WINAPI Loader(ULONG_PTR callAddress)
 	BOOL RES = ((DLLMAIN)uiValueA)((HINSTANCE)uiBaseAddress, DLL_PROCESS_ATTACH, NULL);
 	if (RES);
 	// STEP 8: return our new entry point address so whatever called us can call DllMain() if needed.
+	//这个循环的作用：保证进程不退出，这里不可以用调试器来暂停！（耽误了两天的时间-_-!）
+	while (1);
 }
 
 BOOL FinalizeSections(PMemoryModule mMemory)
@@ -545,15 +547,19 @@ BOOL FinalizeSections(PMemoryModule mMemory)
 #ifdef _WIN64
 	// "PhysicalAddress" might have been truncated to 32bit above, expand to
 	// 64bits again.
-	//拷贝的时候被截断，这里恢复成64位
+	//imageOffset的值，由于PhysicalAddress的值被截断成32位，需要恢复为64位，这里的值就是镜像加载到内存的前8位（被截断掉的8位）
 	uintptr_t imageOffset = ((uintptr_t)mMemory->header->OptionalHeader.ImageBase & 0xffffffff00000000);
 #else
 	static const uintptr_t imageOffset = 0;
 #endif
 	SECTIONFINALIZEDATA sectionData;
+	//恢复为64位
 	sectionData.address = (LPVOID)((uintptr_t)section->Misc.PhysicalAddress | imageOffset);
+	//节首地址
 	sectionData.alignedAddress = AlignAddressDown(sectionData.address, mMemory->sysInfo.dwPageSize);
+	//节大小
 	sectionData.size = GetRealSectionSize(mMemory, section, mMemory->header);
+	//属性
 	sectionData.characteristics = section->Characteristics;
 	sectionData.last = FALSE;
 	section++;
@@ -565,8 +571,11 @@ BOOL FinalizeSections(PMemoryModule mMemory)
 		// Combine access flags of all sections that share a page
 		// TODO(fancycode): We currently share flags of a trailing large section
 		//   with the page of a first small section. This should be optimized.
+		//当前把一大节以第一个节的权限为准（需要优化）
+		//确保在当前页中
 		if (sectionData.alignedAddress == alignedAddress || (uintptr_t)sectionData.address + sectionData.size >(uintptr_t) alignedAddress) {
 			// Section shares page with previous
+			//这里我觉得有一个判断就可以-_-!
 			if ((section->Characteristics & IMAGE_SCN_MEM_DISCARDABLE) == 0 || (sectionData.characteristics & IMAGE_SCN_MEM_DISCARDABLE) == 0) {
 				sectionData.characteristics = (sectionData.characteristics | section->Characteristics) & ~IMAGE_SCN_MEM_DISCARDABLE;
 			}
@@ -594,7 +603,7 @@ BOOL FinalizeSections(PMemoryModule mMemory)
 
 
 
-
+//对节属性的修改
 static BOOL
 FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData) {
 	DWORD protect, oldProtect;
@@ -607,15 +616,15 @@ FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData) {
 	}
 	//IMAGE_SCN_MEM_DISCARDABLE:可以根据需要丢弃，不再被使用，可以安全释放掉
 	if (sectionData->characteristics & IMAGE_SCN_MEM_DISCARDABLE) {
-		// section is not needed any more and can safely be freed
+		//确保释放当前页没有问题
 		if (sectionData->address == sectionData->alignedAddress &&
 			(sectionData->last ||
 				module->header->OptionalHeader.SectionAlignment == module->sysInfo.dwPageSize ||
 				(sectionData->size % module->sysInfo.dwPageSize) == 0)
 			) {
-			// Only allowed to decommit whole pages
-			VirtualFree(sectionData->address, sectionData->size, MEM_DECOMMIT, NULL);
-			//module->free(sectionData->address, sectionData->size, MEM_DECOMMIT, module->userdata);
+			//释放
+			module->mVirtualFree(sectionData->address, sectionData->size, MEM_DECOMMIT, NULL);
+		
 		}
 		return TRUE;
 	}
@@ -629,7 +638,6 @@ FinalizeSection(PMemoryModule module, PSECTIONFINALIZEDATA sectionData) {
 		protect |= PAGE_NOCACHE;
 	}
 
-	// change memory access flags
 	//修改区段访问权限
 	if (module->mVirtualProtect(sectionData->address, sectionData->size, protect, &oldProtect) == 0) {
 		return FALSE;
