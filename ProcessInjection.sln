@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MEMORY MODULE", "MEMORY MODULE\MEMORY MODULE.vcxproj", "{9724121A-8D51-4686-BD83-45567A5E4229}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EXEPayload", "EXEPayload\EXEPayload.vcxproj", "{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemroyInjectionDLL", "MemroyInjectionDLL\MemroyInjectionDLL.vcxproj", "{90E2E935-7557-4AFB-AD9E-B14EC84A243A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HollowingDropper", "HollowingDropper\HollowingDropper.vcxproj", "{6DF3715B-102F-4B2F-8A47-F954478A017B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,22 +15,22 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Debug|x64.ActiveCfg = Debug|x64
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Debug|x64.Build.0 = Debug|x64
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Debug|x86.ActiveCfg = Debug|Win32
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Debug|x86.Build.0 = Debug|Win32
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Release|x64.ActiveCfg = Release|x64
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Release|x64.Build.0 = Release|x64
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Release|x86.ActiveCfg = Release|Win32
-		{9724121A-8D51-4686-BD83-45567A5E4229}.Release|x86.Build.0 = Release|Win32
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Debug|x64.ActiveCfg = Debug|x64
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Debug|x64.Build.0 = Debug|x64
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Debug|x86.ActiveCfg = Debug|Win32
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Debug|x86.Build.0 = Debug|Win32
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Release|x64.ActiveCfg = Release|x64
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Release|x64.Build.0 = Release|x64
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Release|x86.ActiveCfg = Release|Win32
-		{90E2E935-7557-4AFB-AD9E-B14EC84A243A}.Release|x86.Build.0 = Release|Win32
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Debug|x64.ActiveCfg = Debug|x64
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Debug|x64.Build.0 = Debug|x64
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Debug|x86.ActiveCfg = Debug|Win32
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Debug|x86.Build.0 = Debug|Win32
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Release|x64.ActiveCfg = Release|x64
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Release|x64.Build.0 = Release|x64
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Release|x86.ActiveCfg = Release|Win32
+		{974E1B91-0F7A-4139-9DE0-4617A02EA4F3}.Release|x86.Build.0 = Release|Win32
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Debug|x64.ActiveCfg = Debug|x64
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Debug|x64.Build.0 = Debug|x64
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Debug|x86.ActiveCfg = Debug|Win32
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Debug|x86.Build.0 = Debug|Win32
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Release|x64.ActiveCfg = Release|x64
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Release|x64.Build.0 = Release|x64
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Release|x86.ActiveCfg = Release|Win32
+		{6DF3715B-102F-4B2F-8A47-F954478A017B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
