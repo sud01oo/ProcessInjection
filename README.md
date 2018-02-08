@@ -33,7 +33,9 @@
 <ol>4：Process Hollowing
 	<ul>
   	<li>EXEPayload</li>
-	<li>HollowingDropper</li>
+	<li>HollowingDropper（冷注入）</li>
+	<li>参考：https://github.com/m0n0ph1/Process-Hollowing</li>
+	<li>在原项目的基础上，重写了项目，支持x86和x64</li>
 	</ul>
 </ol>
 
