@@ -26,8 +26,7 @@
   	<li>Memory Module</li>
 	<li>MemroyInjectionDLL</li>
 	<li>使用了Reflection Injection的代码，对部分代码进行了修改。</li>
-	<li>参考</li>
-	<li>https://github.com/fancycode/MemoryModule</li>	
+	<li>参考：https://github.com/fancycode/MemoryModule</li>	
 	</ul>
 </ol>
 <ol>4：Process Hollowing
