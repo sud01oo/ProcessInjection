@@ -142,8 +142,22 @@ typedef struct BASE_RELOCATION_BLOCK {
 	DWORD BlockSize;
 } BASE_RELOCATION_BLOCK, *PBASE_RELOCATION_BLOCK;
 
+typedef struct {
+	LPVOID address;
+	LPVOID alignedAddress;
+	ULONG_PTR size;
+	DWORD characteristics;
+	BOOL last;
+} SECTIONFINALIZEDATA, *PSECTIONFINALIZEDATA;
+
+
 
 _PPEB ReadRemotePEB(HANDLE hProcess);
 PLOADED_IMAGE ReadRemoteImage(HANDLE hProcess, LPVOID lpImageBaseAddress);
 PLOADED_IMAGE GetLoadedImage(ULONG_PTR dwImageBase);
 BOOL CopySections(HANDLE hProcess, ULONG_PTR targetBaseAddress, ULONG_PTR srcBuffer);
+BOOL FinalizeSections(HANDLE hProcess, ULONG_PTR targetBaseAddress, ULONG_PTR srcBuffer);
+inline DWORD AlignValueUp(DWORD value, DWORD alignment)
+{
+	return (value + alignment - 1) & ~(alignment - 1);
+}
