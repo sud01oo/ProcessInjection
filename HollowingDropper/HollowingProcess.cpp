@@ -204,7 +204,7 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		return hProcess;
 	}
 #ifdef  _WIN64
-	pContext->Rax = dwEntryPoint;
+	pContext->Rcx = dwEntryPoint;
 #else
 	pContext->Eax = dwEntryPoint;
 #endif //  _WIN64
