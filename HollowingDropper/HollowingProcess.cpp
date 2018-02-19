@@ -84,7 +84,7 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		pPEB->lpImageBaseAddress,
 		alignedImageSize,
 		MEM_RESERVE,//参考Memory Module方式
-		PAGE_READWRITE
+		PAGE_EXECUTE_READWRITE
 	);
 	if (!pRemoteImage)
 	{
@@ -108,7 +108,7 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		pPEB->lpImageBaseAddress,
 		pSourceHeader->OptionalHeader.SizeOfHeaders,
 		MEM_COMMIT,//参考Memory Module方式
-		PAGE_READWRITE
+		PAGE_EXECUTE_READWRITE
 	);
 
 	if (!WriteProcessMemory
@@ -174,6 +174,7 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 						(PVOID)((ULONG_PTR)pPEB->lpImageBaseAddress + dwFieldAddress),
 						&upBuffer,
 						sizeof(ULONG_PTR),
+
 						0
 					);
 					if (!bSuccess)
@@ -186,11 +187,11 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 
 			break;
 		}//end for
-	if (!FinalizeSections(hProcess, (ULONG_PTR)pPEB->lpImageBaseAddress, (ULONG_PTR)pBuffer))
-	{
-		cout << "Finalize Section Failed." << endl;
-		return hProcess;
-	}
+	//if (!FinalizeSections(hProcess, (ULONG_PTR)pPEB->lpImageBaseAddress, (ULONG_PTR)pBuffer))
+	//{
+	//	cout << "Finalize Section Failed." << endl;
+	//	return hProcess;
+	//}
 	DWORD dwBreakpoint = 0xCC;
 	ULONG_PTR dwEntryPoint = (ULONG_PTR)pPEB->lpImageBaseAddress +
 		pSourceHeader->OptionalHeader.AddressOfEntryPoint;
@@ -219,6 +220,6 @@ HANDLE CreateHollowedProcess(LPSTR lpCommandLine, LPSTR lpSourceFile)
 		cout << "Resume Thread Failed" << endl;
 		return hProcess;
 	}
-	return hProcess;
 
+	return hProcess;
 }
