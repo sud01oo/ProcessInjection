@@ -71,7 +71,7 @@ BOOL CopySections(HANDLE hProcess,ULONG_PTR targetBaseAddress,ULONG_PTR srcBuffe
 			section_size = header->OptionalHeader.SectionAlignment;
 			if (section_size > 0)
 			{
-				dest = VirtualAllocEx(hProcess, (LPVOID)(targetBaseAddress + section->VirtualAddress), section_size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+				dest = VirtualAllocEx(hProcess, (LPVOID)(targetBaseAddress + section->VirtualAddress), section_size, MEM_COMMIT, PAGE_READWRITE);
 				if (dest = NULL)
 					return FALSE;
 				dest = (LPVOID)(targetBaseAddress + section->VirtualAddress);
@@ -80,7 +80,7 @@ BOOL CopySections(HANDLE hProcess,ULONG_PTR targetBaseAddress,ULONG_PTR srcBuffe
 			}
 			continue;
 		}
-		dest = VirtualAllocEx(hProcess, (LPVOID)(targetBaseAddress + section->VirtualAddress), section->SizeOfRawData, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		dest = VirtualAllocEx(hProcess, (LPVOID)(targetBaseAddress + section->VirtualAddress), section->SizeOfRawData, MEM_COMMIT, PAGE_READWRITE);
 		ValueA = section->SizeOfRawData;
 		//当前节数据的缓冲区
 		PBYTE currentSectionData = new BYTE[ValueA];
@@ -227,5 +227,14 @@ BOOL FinalizeSections(HANDLE hProcess, ULONG_PTR targetBaseAddress, ULONG_PTR sr
 		if (!FinalizeSection(hProcess, header,&sectionData,sysInfo)) {
 			return FALSE;
 		}
+		sectionData.address = sectionAddress;
+		sectionData.alignedAddress = alignedAddress;
+		sectionData.size = sectionSize;
+		sectionData.characteristics = section->Characteristics;
 	}
+	sectionData.last = TRUE;
+	if (!FinalizeSection(hProcess, header, &sectionData, sysInfo)) {
+		return FALSE;
+	}
+	return TRUE;
 }
