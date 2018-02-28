@@ -35,12 +35,14 @@
 	<li>HollowingDropper（冷注入）</li>
 	<li>参考：https://github.com/m0n0ph1/Process-Hollowing 在原项目的基础上，重写了项目，支持x86和x64</li>
 	<li>在原项目的基础上，重写了项目，支持x86和x64</li>
+	<li>"热"注入失败，源码无法编译，缺少资源文件，项目使用vs online导致一堆问题。给出文章链接：</li>
+		<li>http://riscy.business/2017/11/bypassing-modern-process-hollowing-detection/</li>
 	</ul>
 </ol>
 
 <h2>进行中:</h2>
-Process Hollowing
+null
 	<ul>
-  	<li>热注入</li>
+  	<li>null</li>
 	</ul>
 “images”文件夹是在学习过程中，会遇到的一些数据结构的可视化图片，方便查阅相关结构。
