@@ -41,8 +41,8 @@
 </ol>
 
 <h2>进行中:</h2>
-null
+石像鬼
 	<ul>
-  	<li>null</li>
+  	<li>https://jlospinoso.github.io/security/assembly/c/cpp/developing/software/2017/03/04/gargoyle-memory-analysis-evasion.html</li>
 	</ul>
 “images”文件夹是在学习过程中，会遇到的一些数据结构的可视化图片，方便查阅相关结构。
