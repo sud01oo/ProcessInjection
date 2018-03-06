@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RISCYHollowing", "RISCYHollowing\RISCYHollowing.vcxproj", "{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gargoyle", "Gargoyle\Gargoyle.vcxproj", "{F313E731-84FF-42BB-8EF6-1FC64489C27E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Debug|x64.ActiveCfg = Debug|x64
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Debug|x64.Build.0 = Debug|x64
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Debug|x86.ActiveCfg = Debug|Win32
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Debug|x86.Build.0 = Debug|Win32
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Release|x64.ActiveCfg = Release|x64
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Release|x64.Build.0 = Release|x64
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Release|x86.ActiveCfg = Release|Win32
-		{5BF5E5A0-DB9E-4035-9AA8-3B266075BE6A}.Release|x86.Build.0 = Release|Win32
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Debug|x64.ActiveCfg = Debug|x64
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Debug|x64.Build.0 = Debug|x64
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Debug|x86.ActiveCfg = Debug|Win32
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Debug|x86.Build.0 = Debug|Win32
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Release|x64.ActiveCfg = Release|x64
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Release|x64.Build.0 = Release|x64
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Release|x86.ActiveCfg = Release|Win32
+		{F313E731-84FF-42BB-8EF6-1FC64489C27E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
