@@ -35,7 +35,7 @@
 	<li>HollowingDropper（冷注入）</li>
 	<li>参考：https://github.com/m0n0ph1/Process-Hollowing 在原项目的基础上，重写了项目，支持x86和x64</li>
 	<li>在原项目的基础上，重写了项目，支持x86和x64</li>
-	<li>"热"注入失败，源码无法编译，缺少资源文件，项目使用vs online导致一堆问题。给出文章链接：</li>
+	<li>"热"注入失败，以后再尝试。给出文章链接：</li>
 		<li>http://riscy.business/2017/11/bypassing-modern-process-hollowing-detection/</li>
 	</ul>
 </ol>
