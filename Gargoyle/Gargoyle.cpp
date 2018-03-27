@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <algorithm>
 #include <fstream>
 #include <tuple>

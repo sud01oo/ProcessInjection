@@ -1,3 +1,4 @@
+由于项目整体输出配置问题，需要将setup.pic和gadget.pic两个文件手动移动。
 ========================================================================
     CONSOLE APPLICATION : Gargoyle Project Overview
 ========================================================================
@@ -38,3 +39,4 @@ AppWizard uses "TODO:" comments to indicate parts of the source code you
 should add to or customize.
 
 /////////////////////////////////////////////////////////////////////////////
+
