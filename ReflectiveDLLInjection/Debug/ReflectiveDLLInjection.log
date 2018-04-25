@@ -1,4 +1,1 @@
-﻿  LoadRemoteLibraryR.cpp
-d:\users\sudo\documents\github\processinjection\reflectivedllinjection\loadremotelibraryr.cpp(21): warning C4715: 'Rva2Offset': not all control paths return a value
-  ReflectiveDLLInjection.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\ReflectiveDLLInjection.exe
-  ReflectiveDLLInjection.vcxproj -> D:\users\sudo\Documents\GitHub\ProcessInjection\Debug\ReflectiveDLLInjection.pdb (Full PDB)
+﻿

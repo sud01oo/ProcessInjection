@@ -1,4 +1,1 @@
-﻿  ReflectiveDLLInjection.cpp
-d:\users\sudo\documents\github\processinjection\reflectivedllinjection\reflectivedllinjection.cpp(16): warning C4101: 'dwPID': unreferenced local variable
-  ReflectiveDLLInjection.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLLInjection.exe
-  ReflectiveDLLInjection.vcxproj -> C:\Users\sudo\Desktop\ReflectiveDLLPEForm\x64\Debug\ReflectiveDLLInjection.pdb (Full PDB)
+﻿
